@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MauiApp1.ViewModels"
+             xmlns:models="clr-namespace:MauiApp1.Models"
+             x:Class="MauiApp1.Views.TaskDetailPage"
+             x:DataType="viewmodels:TaskDetailViewModel"
+             BackgroundColor="#f5f5f5"
+             Title="Task Details">
+
+    <ScrollView>
+        <Grid RowDefinitions="Auto,*" Padding="16">
+            <!-- Indicateur de chargement -->
+            <ActivityIndicator Grid.RowSpan="2"
+                               IsRunning="{Binding IsLoading}" 
+                               IsVisible="{Binding IsLoading}"
+                               HorizontalOptions="Center" 
+                               VerticalOptions="Center"
+                               Color="#2196F3" />
+
+            <Grid IsVisible="{Binding Task, Converter={StaticResource NullToBoolConverter}}">
+                <!-- Mode Visualisation -->
+                <StackLayout IsVisible="{Binding IsEditing, Converter={StaticResource InvertedBoolConverter}}">
+                    <!-- En-tête -->
+                    <Frame Margin="0,0,0,16" 
+                           Padding="20" 
+                           CornerRadius="10" 
+                           BorderColor="Transparent"
+                           BackgroundColor="White"
+                           HasShadow="True">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="{Binding Task.Title}" 
+                                   FontSize="24" 
+                                   FontAttributes="Bold"
+                                   TextColor="#333333" />
+                            
+                            <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="12">
+                                <!-- Priority Badge -->
+                                <Border Grid.Column="0"
+                                        StrokeShape="RoundRectangle 12"
+                                        BackgroundColor="{Binding Task.Priority, Converter={StaticResource PriorityColorConverter}}"
+                                        Padding="8,4">
+                                    <Label Text="{Binding Task.Priority}" 
+                                           TextColor="White" 
+                                           FontSize="12"
+                                           FontAttributes="Bold" />
+                                </Border>
+                                
+                                <!-- Status Badge -->
+                                <Border Grid.Column="1"
+                                        StrokeShape="RoundRectangle 12"
+                                        BackgroundColor="{Binding Task.Status, Converter={StaticResource StatusColorConverter}}"
+                                        Padding="8,4">
+                                    <Label Text="{Binding Task.Status}" 
+                                           TextColor="White" 
+                                           FontSize="12"
+                                           FontAttributes="Bold" />
+                                </Border>
+                                
+                                <!-- Due Date -->
+                                <Label Grid.Column="2"
+                                       Text="{Binding Task.DueDate, StringFormat='Due: {0:dd/MM/yyyy}'}"
+                                       IsVisible="{Binding Task.DueDate, Converter={StaticResource NullToBoolConverter}}"
+                                       TextColor="#666666"
+                                       FontSize="14"
+                                       HorizontalOptions="End"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Détails -->
+                    <Frame Margin="0,0,0,16" 
+                           Padding="20" 
+                           CornerRadius="10" 
+                           BorderColor="Transparent"
+                           BackgroundColor="White"
+                           HasShadow="True">
+                        <VerticalStackLayout Spacing="15">
+                            <VerticalStackLayout Spacing="5">
+                                <Label Text="Description" 
+                                       FontAttributes="Bold"
+                                       TextColor="#333333" />
+                                <Label Text="{Binding Task.Description}" 
+                                       TextColor="#555555"
+                                       LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                            
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+                                <Label Grid.Row="0" Grid.Column="0" Text="Created:" FontAttributes="Bold" TextColor="#333333" />
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Task.CreatedAt, StringFormat='{0:g}'}" TextColor="#555555" />
+                                
+                                <Label Grid.Row="1" Grid.Column="0" Text="Updated:" FontAttributes="Bold" TextColor="#333333" />
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Task.UpdatedAt, StringFormat='{0:g}'}" TextColor="#555555" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Changer le statut -->
+                    <Frame Margin="0,0,0,16" 
+                           Padding="20" 
+                           CornerRadius="10" 
+                           BorderColor="Transparent"
+                           BackgroundColor="White"
+                           HasShadow="True">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Change Status" 
+                                   FontAttributes="Bold"
+                                   TextColor="#333333" />
+                            <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+                                <Button Text="Todo" 
+                                        Command="{Binding UpdateStatusCommand}" 
+                                        CommandParameter="{x:Static models:TaskConstants+Status.Todo}"
+                                        BackgroundColor="DarkOrange"
+                                        TextColor="White"
+                                        CornerRadius="20"
+                                        HeightRequest="40"
+                                        WidthRequest="100" />
+                                <Button Text="In Progress" 
+                                        Command="{Binding UpdateStatusCommand}" 
+                                        CommandParameter="{x:Static models:TaskConstants+Status.InProgress}"
+                                        BackgroundColor="Blue"
+                                        TextColor="White"
+                                        CornerRadius="20"
+                                        HeightRequest="40"
+                                        WidthRequest="100" />
+                                <Button Text="Done" 
+                                        Command="{Binding UpdateStatusCommand}" 
+                                        CommandParameter="{x:Static models:TaskConstants+Status.Done}"
+                                        BackgroundColor="Green"
+                                        TextColor="White"
+                                        CornerRadius="20"
+                                        HeightRequest="40"
+                                        WidthRequest="100" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Actions -->
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                        <Button Grid.Column="0"
+                                Text="Back" 
+                                Command="{Binding BackCommand}"
+                                BackgroundColor="#607D8B"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                HeightRequest="50"
+                                CornerRadius="25" />
+                        <Button Grid.Column="1"
+                                Text="Edit" 
+                                Command="{Binding StartEditingCommand}"
+                                BackgroundColor="#2196F3"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                HeightRequest="50"
+                                CornerRadius="25" />
+                        <Button Grid.Column="2"
+                                Text="Delete" 
+                                Command="{Binding DeleteTaskCommand}" 
+                                BackgroundColor="#ff5252"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                HeightRequest="50"
+                                CornerRadius="25" />
+                    </Grid>
+                </StackLayout>
+
+                <!-- Mode Édition -->
+                <StackLayout IsVisible="{Binding IsEditing}">
+                    <!-- En-tête -->
+                    <Frame Margin="0,0,0,16" 
+                           Padding="20" 
+                           CornerRadius="10" 
+                           BorderColor="Transparent"
+                           BackgroundColor="White"
+                           HasShadow="True">
+                        <Label Text="Edit Task" 
+                               FontSize="24" 
+                               FontAttributes="Bold"
+                               TextColor="#333333"
+                               HorizontalOptions="Center" />
+                    </Frame>
+                    
+                    <!-- Formulaire -->
+                    <Frame Margin="0,0,0,16" 
+                           Padding="20" 
+                           CornerRadius="10" 
+                           BorderColor="Transparent"
+                           BackgroundColor="White"
+                           HasShadow="True">
+                        <VerticalStackLayout Spacing="16">
+                            <!-- Titre -->
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Title" 
+                                       FontAttributes="Bold"
+                                       TextColor="#333333" />
+                                <Border Stroke="#e0e0e0"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="10,0">
+                                    <Entry Text="{Binding Title}" 
+                                           Placeholder="Enter task title"
+                                           PlaceholderColor="#aaaaaa"
+                                           TextColor="#333333" />
+                                </Border>
+                            </VerticalStackLayout>
+                            
+                            <!-- Description -->
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Description" 
+                                       FontAttributes="Bold"
+                                       TextColor="#333333" />
+                                <Border Stroke="#e0e0e0"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="10,5">
+                                    <Editor Text="{Binding Description}" 
+                                            Placeholder="Enter task description" 
+                                            PlaceholderColor="#aaaaaa"
+                                            TextColor="#333333"
+                                            HeightRequest="100"
+                                            AutoSize="TextChanges" />
+                                </Border>
+                            </VerticalStackLayout>
+                            
+                            <!-- Priorité -->
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Priority" 
+                                       FontAttributes="Bold"
+                                       TextColor="#333333" />
+                                <Border Stroke="#e0e0e0"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="10,0">
+                                    <Picker ItemsSource="{Binding Priorities}" 
+                                            SelectedItem="{Binding Priority}"
+                                            Title="Select priority"
+                                            TextColor="#333333" />
+                                </Border>
+                            </VerticalStackLayout>
+                            
+                            <!-- Date d'échéance -->
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Due Date" 
+                                       FontAttributes="Bold"
+                                       TextColor="#333333" />
+                                <Border Stroke="#e0e0e0"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="10,0">
+                                    <DatePicker Date="{Binding DueDate}"
+                                                Format="dd/MM/yyyy"
+                                                TextColor="#333333" />
+                                </Border>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                    
+                    <!-- Actions -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                        <Button Grid.Column="0"
+                                Text="Save" 
+                                Command="{Binding SaveTaskCommand}"
+                                BackgroundColor="#4CAF50"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                HeightRequest="50"
+                                CornerRadius="25" />
+                        <Button Grid.Column="1"
+                                Text="Cancel" 
+                                Command="{Binding CancelEditingCommand}"
+                                BackgroundColor="#9e9e9e"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                HeightRequest="50"
+                                CornerRadius="25" />
+                    </Grid>
+                </StackLayout>
+            </Grid>
+        </Grid>
+    </ScrollView>
+</ContentPage> 

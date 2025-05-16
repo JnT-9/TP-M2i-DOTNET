@@ -1,0 +1,46 @@
+@WebApplication1_HostAddress = http://localhost:5000
+
+### Get all tasks
+GET {{WebApplication1_HostAddress}}/api/tasks
+Accept: application/json
+
+### Get tasks by status
+GET {{WebApplication1_HostAddress}}/api/tasks?status=todo
+Accept: application/json
+
+### Get task by ID
+GET {{WebApplication1_HostAddress}}/api/tasks/1
+Accept: application/json
+
+### Create new task
+POST {{WebApplication1_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Test Task",
+  "description": "This is a test task",
+  "priority": "medium",
+  "dueDate": "2023-12-31T12:00:00Z"
+}
+
+### Update task
+PUT {{WebApplication1_HostAddress}}/api/tasks/1
+Content-Type: application/json
+
+{
+  "title": "Updated Task",
+  "description": "This task has been updated",
+  "priority": "high",
+  "dueDate": "2023-12-31T12:00:00Z"
+}
+
+### Update task status
+PUT {{WebApplication1_HostAddress}}/api/tasks/1/status
+Content-Type: application/json
+
+{
+  "status": "in_progress"
+}
+
+### Delete task
+DELETE {{WebApplication1_HostAddress}}/api/tasks/1

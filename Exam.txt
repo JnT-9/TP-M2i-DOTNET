@@ -1,0 +1,11 @@
+Avec le modèle de l'api suivante en cours d'implémentation, vous pouvez déjà commencer à faire une application de gestion de tache avec les
+ fonctionnalité suivantes :
+ 
+Visualisation des tâches
+	Afficher la liste des tâches avec leur titre, priorité et statut
+	Permettre le filtrage par statut
+    
+Gestion des tâches
+	Voir les détails d'une tâche
+	Créer une nouvelle tâche
+	Modifier le statut d'une tâche
