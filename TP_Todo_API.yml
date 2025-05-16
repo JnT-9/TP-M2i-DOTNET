@@ -1,0 +1,254 @@
+openapi: 3.0.1
+info:
+  title: Tasks Collaboration API
+  description: API pour la gestion de tâches collaboratives
+  version: 1.0.0
+servers:
+  - url: https://api.tasks-collaboration.example/v1
+tags:
+  - name: Tasks
+    description: Opérations sur les tâches
+paths:
+  /api/tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Récupère toutes les tâches
+      operationId: getTasks
+      parameters:
+        - name: status
+          in: query
+          description: Filtre par statut
+          schema:
+            type: string
+            enum:
+              - todo
+              - in_progress
+              - done
+          required: false
+      responses:
+        '200':
+          description: Liste des tâches récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non autorisé
+    post:
+      tags:
+        - Tasks
+      summary: Crée une nouvelle tâche
+      operationId: createTask
+      requestBody:
+        description: Tâche à créer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        '201':
+          description: Tâche créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Données invalides
+        '401':
+          description: Non autorisé
+  /api/tasks/{id}:
+    get:
+      tags:
+        - Tasks
+      summary: Récupère une tâche spécifique
+      operationId: getTaskById
+      parameters:
+        - name: id
+          in: path
+          description: ID de la tâche
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tâche récupérée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Tâche non trouvée
+    put:
+      tags:
+        - Tasks
+      summary: Met à jour une tâche existante
+      operationId: updateTask
+      parameters:
+        - name: id
+          in: path
+          description: ID de la tâche
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Nouvelles données de la tâche
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        '200':
+          description: Tâche mise à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non autorisé
+        '404':
+          description: Tâche non trouvée
+    delete:
+      tags:
+        - Tasks
+      summary: Supprime une tâche
+      operationId: deleteTask
+      parameters:
+        - name: id
+          in: path
+          description: ID de la tâche
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Tâche supprimée avec succès
+        '401':
+          description: Non autorisé
+        '404':
+          description: Tâche non trouvée
+  /api/tasks/{id}/status:
+    put:
+      tags:
+        - Tasks
+      summary: Change le statut d'une tâche
+      operationId: updateTaskStatus
+      parameters:
+        - name: id
+          in: path
+          description: ID de la tâche
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Nouveau statut
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - todo
+                    - in_progress
+                    - done
+              required:
+                - status
+      responses:
+        '200':
+          description: Statut mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Requête invalide
+        '401':
+          description: Non autorisé
+        '404':
+          description: Tâche non trouvée
+components:
+  schemas:
+    TaskInput:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Implémenter le module d'authentification
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          example: Créer les API endpoints pour l'authentification des utilisateurs avec JWT
+          maxLength: 500
+        priority:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+          example: high
+        dueDate:
+          type: string
+          format: date-time
+          example: '2025-06-15T14:00:00Z'
+      required:
+        - title
+        - priority
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 42
+        title:
+          type: string
+          example: Implémenter le module d'authentification
+        description:
+          type: string
+          example: Créer les API endpoints pour l'authentification des utilisateurs avec JWT
+        status:
+          type: string
+          enum:
+            - todo
+            - in_progress
+            - done
+          example: in_progress
+        priority:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+          example: high
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-05-10T09:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-05-12T14:30:00Z'
+        dueDate:
+          type: string
+          format: date-time
+          example: '2025-06-15T14:00:00Z'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
